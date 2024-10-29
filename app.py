@@ -12,14 +12,14 @@ nltk.download('stopwords',download_dir='Home/Downloads/AI_virtusa')
 
 app = Flask(__name__)
 
-# Load Model and Tokenizer
+
 def load_model():
     model_name = "t5-base"
     model = T5ForConditionalGeneration.from_pretrained(model_name)
     tokenizer = T5Tokenizer.from_pretrained(model_name)
     return model, tokenizer
 
-# Preprocess Text
+
 def preprocess_text(paragraph):
     sentences = sent_tokenize(paragraph)
     words = word_tokenize(paragraph.lower())
@@ -27,20 +27,20 @@ def preprocess_text(paragraph):
     words = [word for word in words if word.isalnum() and word not in stop_words]
     return sentences, words
 
-# Calculate Importance
+
 def calculate_importance(sentences):
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(sentences)
     importance = dict(zip(vectorizer.get_feature_names_out(), X.sum(axis=0).A1))
     return importance
 
-# Hallucination Level Calculation
+
 def calculate_hallucination_level(sentences, generated_text):
     hallucination_count = sum([1 for word in generated_text.split() if word not in sentences])
     hallucination_level = hallucination_count / len(generated_text.split())
     return hallucination_level
 
-# Generate Questions
+
 def generate_questions(model, tokenizer, sentences, importance, creativity, focus):
     questions = []
     sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
@@ -70,7 +70,7 @@ def generate_questions(model, tokenizer, sentences, importance, creativity, focu
             break
     return questions
 
-# Generate Options
+
 def generate_options(correct_answer, sentences):
     options = [correct_answer]
     distractors = [s for s in sentences if s != correct_answer and len(s.split()) > 5]
@@ -79,7 +79,7 @@ def generate_options(correct_answer, sentences):
     random.shuffle(options)
     return options
 
-# Conversation Type Classification
+
 def classify_conversation(paragraph):
     informative_keywords = {"describe", "explain", "analyze"}
     technical_keywords = {"technology", "engineering", "science"}
